@@ -1,3 +1,0 @@
-Contenido
-del
-archivo

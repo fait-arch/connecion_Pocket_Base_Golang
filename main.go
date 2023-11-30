@@ -3,17 +3,54 @@
 package main
 
 import (
+	//CreateProduct "Connecion_Test/pkg"
 	"fmt"
 	"net/http"
+	"os"
+	"os/exec"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	//-------------------------
-	//	CREACION DE DE DEPENDENCIAS POCKET BASE
-	//-------------------------
 
+	//------------------------------
+	//	LEVANTAMIENTO DE POCKET BASE
+	//------------------------------
+	// Ruta al ejecutable
+	executablePath := ".\\db\\pocketbase.exe"
+	// Argumentos del comando
+	args := []string{"serve"}
+	// Configurar el comando
+	cmd := exec.Command(executablePath, args...)
+	// Configurar la salida estándar y de errores para ver los resultados
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	// Ejecutar el comando en una goroutine
+	go func() {
+		err := cmd.Run()
+		if err != nil {
+			fmt.Printf("Error al ejecutar el comando: %v\n", err)
+		}
+	}()
+	/*
+		//-------------------
+		//	ENVIO A PRODUCTS
+		//-------------------
+		product := &CreateProduct.Product{
+			ProductName:  "test_003",
+			ProductPrice: "6.0",
+		}
+
+		resp, err := CreateProduct.CreateProduct(product)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+		defer resp.Body.Close()
+		fmt.Println(product)
+		fmt.Println("Product created successfully")
+	*/
 	//--------------------------------------------
 	//	CREACION DE UN SERVIDOR WEB SIMPLE CON GIN
 	//--------------------------------------------
@@ -23,7 +60,7 @@ func main() {
 
 	// Rutas estáticas para servir archivos estáticos y publicos (HTML, CSS y JavaScript)
 	router.Static("/static", "./public_web/static")
-	router.Static("/img", "./public_web/templates/img")
+	router.StaticFS("/img", http.Dir("./public_web/templates/img"))
 	router.LoadHTMLGlob("public_web/templates/*.html")
 
 	// Ruta para la página principal
@@ -33,10 +70,6 @@ func main() {
 
 	// Configurar la confianza en los proxies
 	router.ForwardedByClientIP = true
-
-	//
-	//INCIAR POCKET BASE
-	//
 
 	//
 	//INCIAR :8080
